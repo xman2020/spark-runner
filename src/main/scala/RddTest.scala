@@ -1,10 +1,9 @@
-import org.apache.spark._
 import org.apache.spark.rdd.RDD
 
 object RddTest {
 
   def main(args: Array[String]): Unit = {
-    val sc = new SparkContext("local[*]", "RddTest")
+    val sc = SparkUtils.getContext("RddTest", args)
 
     val rdd = sc.parallelize(List(1, 2, 3, 3))
 
@@ -72,8 +71,6 @@ object RddTest {
     // aggregate有点小复杂，rdd3.aggregate(...): (30,5)
     println("rdd3.aggregate(...): " + rdd3.aggregate((0, 0))((x, y) => (x._1 + y, x._2 + 1),
       (x, y) => (x._1 + y._1, x._2 + y._2)))
-
-    val rdd2 = sc.parallelize(List(List(2,10,20), 7, 8))
 
     sc.stop()
   }

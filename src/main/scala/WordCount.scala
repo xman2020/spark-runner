@@ -1,18 +1,12 @@
-import org.apache.spark._
-import org.apache.spark.sql.SparkSession
 
 object WordCount {
 
   def main(args: Array[String]): Unit = {
-    // Sacla版本2.12下，报错：java.lang.NoSuchMethodError: scala.Predef$.refArrayOps([Ljava/lang/Object;)Lscala/collection/mutable/ArrayOps;
-    // Scala版本改为2.11，运行正常
-
-    // Spark自带的Example中，SparkSession方式较为常用；SparkDemo采用的SparkContext方式不常用
-    val spark = SparkSession.builder().appName("WordCount").master("local[*]").getOrCreate()
+    val ss = SparkUtils.getSession("WordCount", args)
 
     // 读取文件行
-    //val lines = spark.sparkContext.textFile("/Users/chenshuyuan/Desktop/project/bigdata/spark-runner/src/main/resources/word.txt")
-    val lines = spark.read.textFile("/Users/chenshuyuan/Desktop/project/bigdata/spark-runner/src/main/resources/word.txt").rdd
+    //val lines = ss.sparkContext.textFile("/Users/chenshuyuan/Desktop/project/bigdata/spark-runner/src/main/resources/word.txt")
+    val lines = ss.read.textFile("/Users/chenshuyuan/Desktop/project/bigdata/spark-runner/src/main/resources/word.txt").rdd
 
     // 提取单词，一行 单词
     val words = lines.flatMap(_.split(" "))
@@ -51,7 +45,7 @@ object WordCount {
 
     println("WordCount is finished!")
 
-    spark.stop()
+    ss.stop()
   }
 
 }
