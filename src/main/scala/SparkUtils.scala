@@ -29,7 +29,10 @@ object SparkUtils {
     // Scala版本改为2.11，运行正常
 
     // Spark自带的Example中，SparkSession方式较为常用；SparkDemo采用的SparkContext方式不常用
-    val ss = SparkSession.builder().appName(app).master("local[*]").getOrCreate()
+    val ss = SparkSession.builder().appName(app).master("local[*]")
+      .config("spark.some.config.option", "some-value").getOrCreate()
+
+    // .config("spark.some.config.option", "some-value") 不知道啥意思
 
     ss
   }

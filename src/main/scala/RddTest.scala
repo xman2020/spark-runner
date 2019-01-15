@@ -76,17 +76,4 @@ object RddTest {
     sc.stop()
   }
 
-  def printRdd[T](method: String, rdd: RDD[T]): Unit = {
-    val rdd2 = rdd.collect()
-    print(method + ": ")
-    rdd2.foreach(x => print(x + " "))
-    println()
-  }
-
-  def printArray[T](method: String, array: Array[T]): Unit = {
-    print(method + ": ")
-    array.foreach(x => print(x + " "))
-    println()
-  }
-
 }
