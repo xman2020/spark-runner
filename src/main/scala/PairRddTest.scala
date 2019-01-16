@@ -1,4 +1,3 @@
-
 object PairRddTest {
 
   def main(args: Array[String]): Unit = {
@@ -87,6 +86,7 @@ object PairRddTest {
     // 查找键的值，rdd.lookup(3): WrappedArray(4, 6, 8)
     println("rdd.lookup(3): " + rdd.lookup(3))
 
+    sc.stop()
   }
 
 }

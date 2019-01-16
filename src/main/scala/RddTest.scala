@@ -1,5 +1,3 @@
-import org.apache.spark.rdd.RDD
-
 object RddTest {
 
   def main(args: Array[String]): Unit = {
