@@ -1,0 +1,7 @@
+dxd,chinese,85.5
+lh,math,92
+xs,english,98.5
+dxd,math,80
+lh,chines,67
+zp,english,75
+xs,math,79.5

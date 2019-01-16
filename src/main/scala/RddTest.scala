@@ -65,7 +65,7 @@ object RddTest {
     println("rdd3.reduce(_ + _): " + rdd3.reduce(_ + _))
 
     // Reduce求和，每个分区加N，rdd3.fold(1)(_ + _): 35
-    println("rdd3.fold(1)(_ + _): " + rdd3.fold(2)(_ + _))
+    println("rdd3.fold(2)(_ + _): " + rdd3.fold(2)(_ + _))
 
     // aggregate有点小复杂，rdd3.aggregate(...): (30,5)
     println("rdd3.aggregate(...): " + rdd3.aggregate((0, 0))((x, y) => (x._1 + y, x._2 + 1),

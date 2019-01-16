@@ -5,8 +5,8 @@ object WordCount {
     val ss = SparkUtils.getSession("WordCount", args)
 
     // 读取文件行
-    //val lines = ss.sparkContext.textFile("/Users/chenshuyuan/Desktop/project/bigdata/spark-runner/src/main/resources/word.txt")
-    val lines = ss.read.textFile("/Users/chenshuyuan/Desktop/project/bigdata/spark-runner/src/main/resources/word.txt").rdd
+    //val lines = ss.sparkContext.textFile("src/main/resources/word.txt")
+    val lines = ss.read.textFile("src/main/resources/word.txt").rdd
 
     println("文本内容:")
     lines.foreach(println)
