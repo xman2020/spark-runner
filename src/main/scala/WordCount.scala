@@ -8,6 +8,9 @@ object WordCount {
     //val lines = ss.sparkContext.textFile("/Users/chenshuyuan/Desktop/project/bigdata/spark-runner/src/main/resources/word.txt")
     val lines = ss.read.textFile("/Users/chenshuyuan/Desktop/project/bigdata/spark-runner/src/main/resources/word.txt").rdd
 
+    println("文本内容:")
+    lines.foreach(println)
+
     // 提取单词，一行 单词
     val words = lines.flatMap(_.split(" "))
 
@@ -26,6 +29,8 @@ object WordCount {
     //    counts.foreach(x => {
     //      println(x._1 + ": " + x._2)
     //    })
+
+    println("单词统计:")
 
     for (x <- counts) {
       println(x._1 + ": " + x._2)

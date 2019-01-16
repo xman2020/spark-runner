@@ -32,7 +32,7 @@ object SparkUtils {
     val ss = SparkSession.builder().appName(app).master("local[*]")
       .config("spark.some.config.option", "some-value").getOrCreate()
 
-    // .config("spark.some.config.option", "some-value") 不知道啥意思
+    // TODO .config("spark.some.config.option", "some-value") 有什么用
 
     ss
   }

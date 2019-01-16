@@ -74,6 +74,7 @@ object DataFrameTest {
     println("ss.sql(\"select subject, avg(score) as avg_score from global_temp.score group by subject order by avg_score desc\"):")
     ss.sql("select subject, avg(score) as avg_score from global_temp.score group by subject order by avg_score desc").show()
 
+    ss.stop()
   }
 
   def readJson(ss: SparkSession) = {
