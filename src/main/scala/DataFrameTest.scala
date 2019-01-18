@@ -9,9 +9,9 @@ object DataFrameTest {
     import ss.implicits._
 
     //val df = readJson(ss)
-    //val df = readTxt(ss)
+    val df = readTxt(ss)
     //val df = readTxt_(ss)
-    val df = readCsv(ss)
+    //val df = readCsv(ss)
 
     // show报错
     //    Exception in thread "main" org.apache.spark.sql.AnalysisException: Since Spark 2.3, the queries from raw JSON/CSV files are disallowed when the
@@ -110,7 +110,8 @@ object DataFrameTest {
     //{"name":"lh","class":"3","no":123127,"subject":"math","score":92.0}
     //{"name":"dxd","class":"3","no":123128,"subject":"math","score":80.0}
     //{"name":"dxd","class":"3","no":123128,"subject":"chinese","score":85.5}
-    println("Writing score2.txt is Finished")
+    println("Writing score2.json is finished!")
+    println()
 
     // 看源代码 type DataFrame = Dataset[Row] ，DataFrame就是DataSet
     val ds = df.as[Score]
@@ -120,7 +121,7 @@ object DataFrameTest {
     ss.stop()
   }
 
-  case class Score(name: String, subject: String, score: Double)
+  //case class Score(name: String, subject: String, score: Double)
 
   def readTxt(ss: SparkSession): DataFrame = {
     import ss.implicits._

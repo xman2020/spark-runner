@@ -11,13 +11,13 @@ object WordCount {
     println("文本内容:")
     lines.foreach(println)
 
-    // 提取单词，一行 单词
+    // 提取单词，每行 单词
     val words = lines.flatMap(_.split(" "))
 
-    // 单词变map，一行 单词, 1
+    // 单词变map，每行 单词, 1
     val ones = words.map((_, 1));
 
-    // 单词聚合，一行 单词，sum值
+    // 单词聚合，每行 单词，sum值
     val counts = ones.reduceByKey(_ + _)
     // 同 reduceByKey((a, b) => a + b)
 
