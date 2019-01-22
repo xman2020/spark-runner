@@ -6,3 +6,6 @@ src/main/resources/score2.json
 src/main/resources/score.parquet
 src/main/resources/score_parquet
 src/main/resources/score_large.parquet
+src/main/resources/score_1000w_parquet
+src/main/resources/score_1y_parquet
+src/main/resources/score_20w_parquet
