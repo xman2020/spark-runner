@@ -1,6 +1,7 @@
 import org.apache.spark._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 object SparkUtils {
 
@@ -33,6 +34,12 @@ object SparkUtils {
       .config("spark.some.config.option", "some-value").getOrCreate()
 
     ss
+  }
+
+  def getStreamContext(app: String, args: Array[String], seconds: Long): StreamingContext = {
+    val ssc = new StreamingContext("local[*]", app, Seconds(seconds))
+
+    ssc
   }
 
   def printRdd[T](method: String, rdd: RDD[T]): Unit = {

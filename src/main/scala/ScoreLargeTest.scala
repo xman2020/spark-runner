@@ -76,6 +76,8 @@ object ScoreLargeTest {
     //
     //2019-01-22T11:06:07.113+08:00
 
+    //println(DateTime.now())
+
     ss.sql("select name, count(*) from score group by name").show()
 
     //2019-01-22T11:06:52.497+08:00
