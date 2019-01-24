@@ -68,7 +68,7 @@ object PairRddTest {
     // 左外连接，rdd.leftOuterJoin(rdd2): (1,(2,None)) (3,(4,Some(9))) (3,(6,Some(9))) (3,(8,Some(9)))
     SparkUtils.printRdd("rdd.leftOuterJoin(rdd2)", rdd.leftOuterJoin(rdd2))
 
-    // 右外连接，
+    // 右外连接，rdd.rightOuterJoin(rdd2): (2,(None,7)) (3,(Some(4),9)) (3,(Some(6),9)) (3,(Some(8),9))
     SparkUtils.printRdd("rdd.rightOuterJoin(rdd2)", rdd.rightOuterJoin(rdd2))
 
     // 相同键的值组合在一起，rdd.cogroup(rdd2): (1,(CompactBuffer(2),CompactBuffer())) (2,(CompactBuffer(),CompactBuffer(7))) (3,(CompactBuffer(4, 6, 8),CompactBuffer(9)))
