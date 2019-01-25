@@ -93,6 +93,10 @@ object ScoreLargeTest {
     //
     //2019-01-22T11:07:04.384+08:00
 
+    //ss.sql("select * from score order by score").show()
+
+    // 1亿条排序17s
+
     println(DateTime.now())
   }
 

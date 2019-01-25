@@ -73,7 +73,7 @@ object StreamTest {
     //========= 1548258370000 ms =========
   }
 
-  case class Login(name: String, time: String, status: String)
+  //case class Login(name: String, time: String, status: String)
 
   def loginWindowCount(stream: DStream[String]): Unit = {
     stream.print()
