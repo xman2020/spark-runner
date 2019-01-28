@@ -1,6 +1,7 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.Seconds
 import org.apache.spark.streaming.dstream.DStream
+import org.joda.time.DateTime
 
 object StreamTest {
 
@@ -41,7 +42,7 @@ object StreamTest {
         val ss = SparkSession.builder().config(rdd.sparkContext.getConf).getOrCreate()
         import ss.implicits._
 
-        val df = rdd.map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
+        val df = rdd.map(_.split(",")).map(x => Login(x(0), DateTime.parse(x(1)).toDate, x(2))).toDF
         df.createOrReplaceTempView("login")
 
         ss.sql("select name, count(*) from login group by name").show()

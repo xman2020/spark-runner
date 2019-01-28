@@ -1,6 +1,7 @@
 import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession, functions}
+import org.joda.time.DateTime
 
 object StructStreamTest {
 
@@ -14,22 +15,102 @@ object StructStreamTest {
 
     //this.wordCount(stream)
 
-    this.loginCount(stream)
+    //this.loginCount(stream)
 
     //this.loginCountSql(stream)
 
     //this.loginCountSql2(ss)
 
-
+    this.loginCountWindow(stream)
 
   }
 
+  def loginCountWindow(stream: DataFrame): Unit = {
+    import stream.sparkSession.implicits._
+
+    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), DateTime.parse(x(1)).toDate, x(2))).toDF
+    val df2 = df.withWatermark("time", "10 seconds")
+      .groupBy(functions.window($"time", "30 seconds", "5 seconds"),
+      $"name"
+    ).count()
+
+    this.output("update", df2)
+
+    // 一行一行输入
+    //lh,2019-01-28 16:34:40,success
+    //xs,2019-01-28 16:35:41,success
+    //xs,2019-01-28 16:35:41,success
+    //lh,2019-01-29 16:35:41,success
+    //-------------------------------------------
+    //Batch: 0
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-01-28 16:34:20, 2019-01-28 16:34:50]|lh  |1    |
+    //|[2019-01-28 16:34:30, 2019-01-28 16:35:00]|lh  |1    |
+    //|[2019-01-28 16:34:40, 2019-01-28 16:35:10]|lh  |1    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/01/28 17:02:16 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 10392 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 1
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-01-28 16:34:20, 2019-01-28 16:34:50]|lh  |1    |
+    //|[2019-01-28 16:34:30, 2019-01-28 16:35:00]|lh  |1    |
+    //|[2019-01-28 16:34:40, 2019-01-28 16:35:10]|lh  |1    |
+    //|[2019-01-28 16:35:40, 2019-01-28 16:36:10]|xs  |1    |
+    //|[2019-01-28 16:35:20, 2019-01-28 16:35:50]|xs  |1    |
+    //|[2019-01-28 16:35:30, 2019-01-28 16:36:00]|xs  |1    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/01/28 17:02:39 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 5660 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 2
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-01-28 16:34:20, 2019-01-28 16:34:50]|lh  |1    |
+    //|[2019-01-28 16:34:30, 2019-01-28 16:35:00]|lh  |1    |
+    //|[2019-01-28 16:34:40, 2019-01-28 16:35:10]|lh  |1    |
+    //|[2019-01-28 16:35:40, 2019-01-28 16:36:10]|xs  |2    |
+    //|[2019-01-28 16:35:20, 2019-01-28 16:35:50]|xs  |2    |
+    //|[2019-01-28 16:35:30, 2019-01-28 16:36:00]|xs  |2    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/01/28 17:04:20 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 6303 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 3
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-01-29 16:35:20, 2019-01-29 16:35:50]|lh  |1    |
+    //|[2019-01-29 16:35:30, 2019-01-29 16:36:00]|lh  |1    |
+    //|[2019-01-28 16:34:20, 2019-01-28 16:34:50]|lh  |1    |
+    //|[2019-01-28 16:34:30, 2019-01-28 16:35:00]|lh  |1    |
+    //|[2019-01-29 16:35:40, 2019-01-29 16:36:10]|lh  |1    |
+    //|[2019-01-28 16:34:40, 2019-01-28 16:35:10]|lh  |1    |
+    //|[2019-01-28 16:35:40, 2019-01-28 16:36:10]|xs  |2    |
+    //|[2019-01-28 16:35:20, 2019-01-28 16:35:50]|xs  |2    |
+    //|[2019-01-28 16:35:30, 2019-01-28 16:36:00]|xs  |2    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/01/28 17:05:02 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 5660 milliseconds
+  }
 
 
   def loginCountSql(stream: DataFrame): Unit = {
     import stream.sparkSession.implicits._
 
-    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
+    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), DateTime.parse(x(1)).toDate, x(2))).toDF
     df.createOrReplaceTempView("login")
     val df2 = stream.sparkSession.sql("select name, count(*) from login group by name")
 
@@ -180,8 +261,12 @@ object StructStreamTest {
   }
 
   def output(mode: String, result: DataFrame): Unit = {
-    val query = result.writeStream.outputMode(mode).format("console")
+    val query = result.writeStream.outputMode(mode).format("console").option("truncate", "false")
       .trigger(Trigger.ProcessingTime(1000)).start()
+
+    //    val query = result.writeStream.outputMode(mode).format("text")
+    //      .option("checkpointLocation", "src/main/resources/checkpoint")
+    //      .option("path", "src/main/resources/struct_stream_out")
 
     // 10ms告警，搞不定，改为100ms
     //19/01/24 21:46:17 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 10 milliseconds, but spent 12 milliseconds
@@ -207,5 +292,5 @@ object StructStreamTest {
 
     this.output("complete", df2)
   }
-  
+
 }
