@@ -47,6 +47,9 @@ object StructStreamTest {
 
     this.output("complete", df2)
 
+    // complete、update模式都正常，append报错
+    // Exception in thread "main" org.apache.spark.sql.AnalysisException: Append output mode not supported when there are streaming aggregations on streaming DataFrames/DataSets without watermark
+
     // 一行一行输入
     //lh,2019-01-28 16:34:40,success
     //lh,2019-01-28 16:34:40,success
@@ -370,6 +373,7 @@ object StructStreamTest {
     val query = result.writeStream.outputMode(mode).format("console").option("truncate", "false")
       .trigger(Trigger.ProcessingTime(1000)).start()
 
+    // 输出到Text文件有待摸索
     //    val query = result.writeStream.outputMode(mode).format("text")
     //      .option("checkpointLocation", "src/main/resources/checkpoint")
     //      .option("path", "src/main/resources/struct_stream_out")
@@ -390,7 +394,7 @@ object StructStreamTest {
     val df = ss.readStream.format("socket").option("host", "localhost").option("port", "9999")
       .option("sep", ",").schema(schema).load()
 
-    // 不能用，运行报错
+    // 该方法运行报错
     // Exception in thread "main" org.apache.spark.sql.AnalysisException: The socket source does not support a user-specified schema.;
 
     df.createOrReplaceTempView("login")

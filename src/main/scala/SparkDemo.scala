@@ -20,6 +20,9 @@ object SparkDemo {
 
     println("SparkDemo is finished!")
 
+    // 可以停下来看4040
+    //Thread.sleep(10 * 60 * 1000)
+
     sc.stop()
 
     // 如果用spark-submit提交运行
