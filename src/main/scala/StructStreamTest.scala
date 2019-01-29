@@ -21,20 +21,126 @@ object StructStreamTest {
 
     //this.loginCountSql2(ss)
 
-    this.loginCountWindow(stream)
+    //this.loginCountWindow(stream)
 
+    //this.loginCountWindow2(stream)
+
+    this.loginCountWindowSql(stream)
+  }
+
+  def temp = {
+
+    //    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
+    //    val df2 = df.withWatermark("time", "10 seconds")
+    //      .groupBy(functions.window($"time", "30 seconds", "10 seconds"),
+    //        $"name"
+    //      ).count()
+  }
+
+  def loginCountWindowSql(stream: DataFrame): Unit = {
+    import stream.sparkSession.implicits._
+
+    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
+    df.createOrReplaceTempView("login")
+    val df2 = stream.sparkSession.sql("select name, window(time, '30 seconds'), count(*) " +
+      "from login group by name, window(time, '30 seconds')")
+
+    this.output("complete", df2)
+
+    // 一行一行输入
+    //lh,2019-01-28 16:34:40,success
+    //lh,2019-01-28 16:34:40,success
+    //dxd,2019-02-01 08:21:08,success
+    //-------------------------------------------
+    //Batch: 0
+    //-------------------------------------------
+    //+----+------------------------------------------+--------+
+    //|name|window                                    |count(1)|
+    //+----+------------------------------------------+--------+
+    //|lh  |[2019-01-28 16:34:30, 2019-01-28 16:35:00]|1       |
+    //+----+------------------------------------------+--------+
+    //
+    //19/01/29 11:00:16 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 13901 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 1
+    //-------------------------------------------
+    //+----+------------------------------------------+--------+
+    //|name|window                                    |count(1)|
+    //+----+------------------------------------------+--------+
+    //|lh  |[2019-01-28 16:34:30, 2019-01-28 16:35:00]|2       |
+    //+----+------------------------------------------+--------+
+    //
+    //19/01/29 11:00:29 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 6113 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 2
+    //-------------------------------------------
+    //+----+------------------------------------------+--------+
+    //|name|window                                    |count(1)|
+    //+----+------------------------------------------+--------+
+    //|dxd |[2019-02-01 08:21:00, 2019-02-01 08:21:30]|1       |
+    //|lh  |[2019-01-28 16:34:30, 2019-01-28 16:35:00]|2       |
+    //+----+------------------------------------------+--------+
+    //
+    //19/01/29 11:01:11 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 6253 milliseconds
+  }
+
+  def loginCountWindow2(stream: DataFrame): Unit = {
+    import stream.sparkSession.implicits._
+
+    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
+    val df2 = df.groupBy(functions.window($"time", "30 seconds"),
+      $"name").count()
+
+    this.output("update", df2)
+
+    // 一行一行输入
+    //lh,2019-01-28 16:34:40,success
+    //lh,2019-01-28 16:34:40,success
+    //dxd,2019-02-01 08:21:08,success
+    //-------------------------------------------
+    //Batch: 0
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-01-28 16:34:30, 2019-01-28 16:35:00]|lh  |1    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/01/29 10:50:54 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 10581 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 1
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-01-28 16:34:30, 2019-01-28 16:35:00]|lh  |2    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/01/29 10:51:05 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 6943 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 2
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-02-01 08:21:00, 2019-02-01 08:21:30]|dxd |1    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/01/29 10:51:15 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 5353 milliseconds
   }
 
   def loginCountWindow(stream: DataFrame): Unit = {
     import stream.sparkSession.implicits._
 
-    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), DateTime.parse(x(1)).toDate, x(2))).toDF
-    val df2 = df.withWatermark("time", "10 seconds")
-      .groupBy(functions.window($"time", "30 seconds", "5 seconds"),
-      $"name"
-    ).count()
+    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
+    val df2 = df.groupBy(functions.window($"time", "30 seconds", "10 seconds"),
+      $"name").count()
 
-    this.output("update", df2)
+    this.output("complete", df2)
 
     // 一行一行输入
     //lh,2019-01-28 16:34:40,success
@@ -110,7 +216,7 @@ object StructStreamTest {
   def loginCountSql(stream: DataFrame): Unit = {
     import stream.sparkSession.implicits._
 
-    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), DateTime.parse(x(1)).toDate, x(2))).toDF
+    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
     df.createOrReplaceTempView("login")
     val df2 = stream.sparkSession.sql("select name, count(*) from login group by name")
 
