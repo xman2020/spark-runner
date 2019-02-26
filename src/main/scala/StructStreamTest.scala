@@ -178,8 +178,41 @@ object StructStreamTest {
     //
     //19/01/29 10:51:15 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 5353 milliseconds
 
-    //val df2 = df.groupBy(functions.window($"time", "12 months"),
-    //Exception in thread "main" java.lang.IllegalArgumentException: Intervals greater than a month is not supported (12 months).
+    // 测试同一数据，在不同精度下的表现
+    //lh,2019-02-26 16:29:37,success
+    //
+    // 1 seconds
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-02-26 16:29:37, 2019-02-26 16:29:38]|lh  |1    |
+    //+------------------------------------------+----+-----+
+    //
+    // 1 minutes
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-02-26 16:29:00, 2019-02-26 16:30:00]|lh  |1    |
+    //+------------------------------------------+----+-----+
+    //
+    // 1 hours
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-02-26 16:00:00, 2019-02-26 17:00:00]|lh  |1    |
+    //+------------------------------------------+----+-----+
+    //
+    // 1 days
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-02-26 08:00:00, 2019-02-27 08:00:00]|lh  |1    |
+    //+------------------------------------------+----+-----+
+    // 为什么是8点，是否可以调整
+
+    // 1 months
+    // 启动报错：Exception in thread "main" java.lang.IllegalArgumentException: Intervals greater than a month is not supported (1 months).
+    // month不支持
   }
 
   def loginCountWindow(stream: DataFrame): Unit = {
