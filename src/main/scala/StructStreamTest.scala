@@ -25,16 +25,63 @@ object StructStreamTest {
 
     //this.loginCountWindow2(stream)
 
-    this.loginCountWindowSql(stream)
+    //this.loginCountWindowSql(stream)
+
+    this.loginCountWatermark(stream)
   }
 
   def temp = {
 
-    //    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
-    //    val df2 = df.withWatermark("time", "10 seconds")
-    //      .groupBy(functions.window($"time", "30 seconds", "10 seconds"),
-    //        $"name"
-    //      ).count()
+  }
+
+  def loginCountWatermark(stream: DataFrame): Unit = {
+    import stream.sparkSession.implicits._
+
+    val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
+    val df2 = df.withColumn("timestamp", functions.to_timestamp($"time", "yyyy-MM-dd HH:mm:ss"))
+      .withWatermark("timestamp", "10 seconds")
+      .groupBy(functions.window($"timestamp", "30 seconds"),
+        $"name").count()
+
+    this.output("update", df2)
+
+    // 一行一行输入
+    //lh,2019-01-28 16:34:40,success
+    //lh,2019-01-28 16:34:29,success
+    //lh,2019-01-28 16:34:30,success
+    //-------------------------------------------
+    //Batch: 0
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-01-28 16:34:30, 2019-01-28 16:35:00]|lh  |1    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/02/26 15:19:29 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 11078 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 1
+    //-------------------------------------------
+    //+------+----+-----+
+    //|window|name|count|
+    //+------+----+-----+
+    //+------+----+-----+
+    //
+    //19/02/26 15:19:42 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 6385 milliseconds
+    //
+    //-------------------------------------------
+    //Batch: 2
+    //-------------------------------------------
+    //+------------------------------------------+----+-----+
+    //|window                                    |name|count|
+    //+------------------------------------------+----+-----+
+    //|[2019-01-28 16:34:30, 2019-01-28 16:35:00]|lh  |2    |
+    //+------------------------------------------+----+-----+
+    //
+    //19/02/26 15:20:06 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 6120 milliseconds
+
+    // 虽然第二次的数据丢弃了，但是还是有一条空输出
   }
 
   def loginCountWindowSql(stream: DataFrame): Unit = {
@@ -47,7 +94,8 @@ object StructStreamTest {
 
     this.output("complete", df2)
 
-    // complete、update模式都正常，append报错
+    // complete、update模式都正常
+    // append报错
     // Exception in thread "main" org.apache.spark.sql.AnalysisException: Append output mode not supported when there are streaming aggregations on streaming DataFrames/DataSets without watermark
 
     // 一行一行输入
@@ -93,7 +141,7 @@ object StructStreamTest {
     import stream.sparkSession.implicits._
 
     val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
-    val df2 = df.groupBy(functions.window($"time", "30 seconds"),
+    val df2 = df.withWatermark("time", "10 seconds").groupBy(functions.window($"time", "30 seconds"),
       $"name").count()
 
     this.output("update", df2)
