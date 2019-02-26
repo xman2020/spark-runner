@@ -22,15 +22,11 @@ object StructStreamTest {
 
     //this.loginCountWindow(stream)
 
-    //this.loginCountWindow2(stream)
+    this.loginCountWindow2(stream)
 
     //this.loginCountWindowSql(stream)
 
-    this.loginCountWatermark(stream)
-  }
-
-  def temp = {
-
+    //this.loginCountWatermark(stream)
   }
 
   def loginCountWatermark(stream: DataFrame): Unit = {
@@ -140,7 +136,7 @@ object StructStreamTest {
     import stream.sparkSession.implicits._
 
     val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
-    val df2 = df.withWatermark("time", "10 seconds").groupBy(functions.window($"time", "30 seconds"),
+    val df2 = df.groupBy(functions.window($"time", "30 seconds"),
       $"name").count()
 
     this.output("update", df2)
@@ -181,6 +177,9 @@ object StructStreamTest {
     //+------------------------------------------+----+-----+
     //
     //19/01/29 10:51:15 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 1000 milliseconds, but spent 5353 milliseconds
+
+    //val df2 = df.groupBy(functions.window($"time", "12 months"),
+    //Exception in thread "main" java.lang.IllegalArgumentException: Intervals greater than a month is not supported (12 months).
   }
 
   def loginCountWindow(stream: DataFrame): Unit = {
