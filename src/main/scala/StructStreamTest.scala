@@ -1,7 +1,6 @@
 import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, SparkSession, functions}
-import org.joda.time.DateTime
 
 object StructStreamTest {
 

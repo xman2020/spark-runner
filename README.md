@@ -16,3 +16,5 @@ ParquetTest
 ScoreLargeTest
 
 StreamTest
+
+StructStreamTest
