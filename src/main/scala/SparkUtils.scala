@@ -17,6 +17,8 @@ object SparkUtils {
     // 测试local[100]，也能跑起来
     conf.setMaster("local[*]")
 
+    // 运行时4C1G
+
     val sc = new SparkContext(conf)
 
     // 简单写法
