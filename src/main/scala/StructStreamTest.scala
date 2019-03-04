@@ -213,6 +213,12 @@ object StructStreamTest {
     // 1 months
     // 启动报错：Exception in thread "main" java.lang.IllegalArgumentException: Intervals greater than a month is not supported (1 months).
     // month不支持
+
+    // 优化配置，spark.sql.shuffle.partitions=4（原来200），见SparkUtils
+    // 原来第一次执行：10581 milliseconds
+    // 现在第一次执行：4841 milliseconds
+    // 比原来快多了
+
   }
 
   def loginCountWindow(stream: DataFrame): Unit = {

@@ -31,7 +31,13 @@ object SparkUtils {
 
     // Spark自带的Example中，SparkSession方式较为常用；SparkDemo采用的SparkContext方式不常用
     val ss = SparkSession.builder().appName(app).master("local[*]")
-      .config("spark.some.config.option", "some-value").getOrCreate()
+      .config("spark.some.config.option", "some-value").config("spark.sql.shuffle.partitions", "4").getOrCreate()
+
+    //.config("spark.default.parallelism", "4")
+
+//    println(ss.sparkContext.defaultParallelism)
+//    println(ss.sparkContext.defaultMinPartitions)
+//    ss.sparkContext.getConf.getAll.foreach(println(_ ))
 
     ss
   }
