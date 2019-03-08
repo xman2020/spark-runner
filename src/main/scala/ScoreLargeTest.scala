@@ -35,6 +35,8 @@ object ScoreLargeTest {
     df.createOrReplaceTempView("score")
     //ss.sql("select * from score where name='csy'").show()
 
+    println(DateTime.now())
+
     // 1亿条只要11s
     //2019-01-22T11:04:11.826+08:00
     //+----+-------+-----+
@@ -78,7 +80,7 @@ object ScoreLargeTest {
 
     //println(DateTime.now())
 
-    ss.sql("select name, count(*) from score group by name").show()
+    //ss.sql("select name, count(*) from score  group by name").show()
 
     //2019-01-22T11:06:52.497+08:00
     //+----+--------+
@@ -96,6 +98,8 @@ object ScoreLargeTest {
     //ss.sql("select * from score order by score").show()
 
     // 1亿条排序17s
+
+    ss.sql("select name, count(*) from score where score > 1  group by name").show()
 
     println(DateTime.now())
   }
