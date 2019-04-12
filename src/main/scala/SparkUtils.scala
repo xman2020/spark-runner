@@ -33,13 +33,19 @@ object SparkUtils {
 
     // Spark自带的Example中，SparkSession方式较为常用；SparkDemo采用的SparkContext方式不常用
     val ss = SparkSession.builder().appName(app).master("local[*]")
-      .config("spark.some.config.option", "some-value").config("spark.sql.shuffle.partitions", "4").getOrCreate()
+      .config("spark.some.config.option", "some-value")
+      .config("spark.sql.shuffle.partitions", "4")
+      .config("spark.driver.host", "localhost")
+      .getOrCreate()
+
+    // .config("spark.driver.host", "localhost")解决以下报错
+    // Exception in thread "main" java.net.BindException: Can't assign requested address: Service 'sparkDriver' failed after 16 retries (on a random free port)! Consider explicitly setting the appropriate binding address for the service 'sparkDriver' (for example spark.driver.bindAddress for SparkDriver) to the correct binding address.
 
     //.config("spark.default.parallelism", "4")
 
-//    println(ss.sparkContext.defaultParallelism)
-//    println(ss.sparkContext.defaultMinPartitions)
-//    ss.sparkContext.getConf.getAll.foreach(println(_ ))
+    //println(ss.sparkContext.defaultParallelism)
+    //println(ss.sparkContext.defaultMinPartitions)
+    //ss.sparkContext.getConf.getAll.foreach(println(_))
 
     ss
   }
