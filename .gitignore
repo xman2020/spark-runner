@@ -10,3 +10,4 @@ src/main/resources/score_1000w_parquet
 src/main/resources/score_1y_parquet
 src/main/resources/score_20w_parquet
 src/main/resources/login_receive
+README-ignore.md

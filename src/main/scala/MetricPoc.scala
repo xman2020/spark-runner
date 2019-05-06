@@ -33,22 +33,23 @@ object MetricPoc {
 
     val df = stream.as[String].map(_.split(",")).map(x => Login(x(0), x(1), x(2))).toDF
     val df2 = df.withColumn("timestamp", functions.to_timestamp($"time", "yyyy-MM-dd HH:mm:ss"))
-      //.withWatermark("timestamp", "10 seconds")
-      .groupBy(functions.window($"timestamp", "30 seconds"),
-        $"name").count()
+      .withWatermark("timestamp", "10 seconds")
+      //.groupBy(functions.window($"timestamp", "30 seconds"),
+      //  $"name").count()
 
     //lh,2019-01-28 16:34:40,success
     //lh,2019-01-28 16:34:29,success
     //lh,2019-01-28 16:34:30,success
 
+    df2.createOrReplaceTempView("login")
 
-//    df2.createOrReplaceTempView("login")
-//
-//    val df3 = df2.sparkSession.sql("select name, window(time, '30 seconds'), count(*) " +
-//      "from login group by name, window(time, '30 seconds')")
+    val df3 = df2.sparkSession.sql("select name, window(time, '30 seconds'), count(*) " +
+      "from login group by name, window(time, '30 seconds')")
 
+    //ToFix
+    //问题：这种用法Watermark不起作用
 
-    this.output("update", df2)
+    this.output("update", df3)
   }
 
   def loginCountWindowSql(stream: DataFrame): Unit = {
@@ -59,8 +60,10 @@ object MetricPoc {
     val df2 = stream.sparkSession.sql("select name, window(time, '30 seconds'), count(*) " +
       "from login group by name, window(time, '30 seconds')")
 
-    val df3 = stream.sparkSession.sql("select * " +
-      "from login ")
+    val df3 = stream.sparkSession.sql("select * from login ")
+
+    //ToFix
+    //问题：df3没有作用
 
     this.output("update", df2)
     this.output("update", df3)
