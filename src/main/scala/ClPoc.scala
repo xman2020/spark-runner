@@ -1,5 +1,5 @@
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.streaming.Trigger
-import org.apache.spark.sql.{DataFrame, functions}
 
 object ClPoc {
 
