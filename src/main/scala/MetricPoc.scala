@@ -63,7 +63,7 @@ object MetricPoc {
     val df3 = stream.sparkSession.sql("select * from login ")
 
     //ToFix
-    //问题：df3没有作用
+    //问题：df2没有作用
 
     this.output("update", df2)
     this.output("update", df3)

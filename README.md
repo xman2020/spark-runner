@@ -20,3 +20,10 @@ StreamTest
 StructStreamTest
 
 MetricPoc
+
+
+//ignore
+
+ClPoc
+
+ClSchema  
